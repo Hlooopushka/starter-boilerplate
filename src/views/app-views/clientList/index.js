@@ -1,7 +1,12 @@
-import { Space, Table, Tag } from 'antd';
+import { Table} from 'antd';
+import { useHistory } from "react-router-dom";
 import axios from 'axios';
 import Loading from 'components/shared-components/Loading';
 import React, { useEffect, useState } from 'react';
+import { APP_PREFIX_PATH } from 'configs/AppConfig'
+import { putUserData } from 'redux/actions/User';
+import { connect } from "react-redux";
+
 const columns = [
   {
     title: 'Имя',
@@ -10,7 +15,7 @@ const columns = [
     render: (text) => <a>{text}</a>,
   },
   {
-    title: 'Никнейм',
+    title: 'Фамилия',
     dataIndex: 'username',
     key: 'username',
   },
@@ -45,20 +50,13 @@ const filterItem = (item) => {
       return  result
 }
 
-const data = [
-  {
-    key: '1',
-    name: 'John Brown',
-    username: 'Kim',
-    email: 'kim@brown.com', 
-    phone: '645226987412',
-    company: 'Company & Co'
-  },
-];
-const ClientTable = () => {
+
+const ClientTable = ({ putUserData  }) => {
 
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(false)
+
+    const history = useHistory();
 
     useEffect(()=>{
         const fetchUsers = async () => {
@@ -84,6 +82,31 @@ const ClientTable = () => {
 
     if (loading) { return <Loading/>}
 
-    return<Table columns={columns} dataSource={users} />
+    return( 
+    <div className='ant-table-wrapper'>
+      <Table 
+        columns={columns} 
+        dataSource={users} 
+        onRow={(row, rowIndex)=>{
+          return {
+            onClick: event => {
+              if (event.target.nodeName === 'A') 
+              {
+                putUserData(row)
+                history.push(`${APP_PREFIX_PATH}/user-edit`)
+              }
+                //{console.log('clicked');} else {console.log('wrong cell')}
+              
+            }
+          }
+        }}/> 
+      </div>
+    )
 };
-export default ClientTable;
+
+const mapStateToProps = ({ user }) => {
+  const { putUserData  } =  user;
+  return { putUserData  }
+};
+
+export default connect(mapStateToProps, {putUserData})(ClientTable);
