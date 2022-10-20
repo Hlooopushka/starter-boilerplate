@@ -11,10 +11,16 @@ import { APP_PREFIX_PATH, AUTH_PREFIX_PATH } from 'configs/AppConfig'
 export const Views = (props) => {
   const { locale, location } = props;
   const currentAppLocale = AppLocale[locale];
+
+  const languageError = () =>{
+    //empty function to remove RU locale errors
+  }
+
   return (
     <IntlProvider
       locale={currentAppLocale.locale}
-      messages={currentAppLocale.messages}>
+      messages={currentAppLocale.messages}
+      onError={languageError}>
       <ConfigProvider locale={currentAppLocale.antd}>
         <Switch>
           <Route exact path="/">
