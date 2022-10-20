@@ -1,44 +1,42 @@
 import { Button, Form, Input } from 'antd';
-import React, { useEffect, useState } from 'react';
-import {  clearUserData } from 'redux/actions';
+import React, { useEffect, useRef, useState } from 'react';
+import {  clearUserData, showLoading } from 'redux/actions';
 import { connect, useSelector } from "react-redux";
 import Loading from 'components/shared-components/Loading';
+import { useHistory } from "react-router-dom";
+import { APP_PREFIX_PATH } from 'configs/AppConfig'
 
+const initialValues = {'name':'', 'username':'', 'email':'', 'phone':'', 'company':''}
 
-
-
-const UserEdit = ({ clearUserData}) => {
+const UserEdit = ({ clearUserData, showLoading}) => {
     const [userData, setUserData] = useState({});
     const data = useSelector((state) => state.user)
+    const {loading} = useSelector((state) => state.user)
+    const form = useRef(null)
+    const history = useHistory();
+useEffect(()=>{   
+   setUserData(data);
+   }
+   ,[data])
 
-useEffect(() => {
-    setUserData(data);
-}, [data])
+useEffect(()=>{
+  if (!loading) {form.current.setFieldsValue(userData)}
+},[userData])
+
   const onFinish = (values) => {
-    console.log('Success:', values);
+    showLoading()
+     setTimeout(() => {
+       clearUserData();
+      history.push(`${APP_PREFIX_PATH}/clients-list`)}, 1000)
   };
-const [save, setSave] = useState({
-  name:'', 
-  username:'', 
-  email: '', 
-  phone:'', 
-  company:''
-});
 
-const handleChange =(e) => {
-  const value = e.target.value;
-  <Loading/>
-  setSave({
-    ...save,
-    [e.target.name]: value
-  });
-}
-
+if (loading) return <Loading/>
 
   return (
     <div> 
     <h1>Информация о себе:</h1>
     <Form
+      ref={form}
       name="basic"
       labelCol={{
         span: 8,
@@ -46,13 +44,14 @@ const handleChange =(e) => {
       wrapperCol={{
         span: 116,
       }}
-      onFinish={onFinish}
+      
       autoComplete="off"
       style={{
         width: '750px',
         marginTop:'100px',
         marginLeft:'100px'
       }}
+      initialValues={initialValues}
     >
     <Form.Item
       label="Имя"
@@ -62,7 +61,6 @@ const handleChange =(e) => {
         borderColor:'#3E79F7',
         opacity:'70%'
     }} 
-        placeholder={userData.name}
     />
       </Form.Item>
       <Form.Item
@@ -111,7 +109,7 @@ const handleChange =(e) => {
           span: 16,
         }}
       >
-    <Button type="primary" htmlType="submit" save={handleChange} >
+    <Button type="primary" htmlType="submit" onClick={onFinish}>
           Сохранить
     </Button>
     <Button type="primary" htmlType="reset"
@@ -128,10 +126,10 @@ const handleChange =(e) => {
 };
 
 const mapStateToProps = ({ user }) => {
-    const { clearUserData} =  user;
-    return { clearUserData}
+    const { clearUserData, showLoading} =  user;
+    return { clearUserData, showLoading}
   };
   
-  export default connect(mapStateToProps, { clearUserData})(UserEdit);
+  export default connect(mapStateToProps, { clearUserData, showLoading})(UserEdit);
   
 

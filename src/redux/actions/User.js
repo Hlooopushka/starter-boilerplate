@@ -1,4 +1,4 @@
-import { PUT_USER_DATA, GET_USER_DATA, CLEAR_USER_DATA } from "redux/constants/User";
+import { PUT_USER_DATA, SHOW_LOADING, CLEAR_USER_DATA } from "redux/constants/User";
 
 export const putUserData = (user) => {
     return {
@@ -7,13 +7,11 @@ export const putUserData = (user) => {
     }
   };
 
-//   export const getUserData = (data) => {
-//     return {
-//       type: GET_USER_DATA,
-//       payload: data
-//     }
-//   };
-
+  export const showLoading = () => {
+    return {
+      type: SHOW_LOADING,
+    };
+  };
   export const clearUserData = () => {
     return {
       type: CLEAR_USER_DATA
